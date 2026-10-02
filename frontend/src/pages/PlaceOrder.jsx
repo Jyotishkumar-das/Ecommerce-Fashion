@@ -1,10 +1,17 @@
 import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 import { ShopContext } from "../context/ShopContextProvider";
 import { assets } from "../assets/assets";
 
 const PlaceOrder = () => {
   const navigate = useNavigate();
+
+  // ================= BACKEND URL =================
+
+  const backendUrl = import.meta.env.VITE_API_URL;
+
+  // ================= SHOP CONTEXT =================
 
   const {
     products,
@@ -15,8 +22,15 @@ const PlaceOrder = () => {
     setCartItems
   } = useContext(ShopContext);
 
+  // ================= PAYMENT =================
+
   const [paymentMethod, setPaymentMethod] = useState("cod");
+
+  // ================= LOADING =================
+
   const [loading, setLoading] = useState(false);
+
+  // ================= FORM DATA =================
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -30,6 +44,8 @@ const PlaceOrder = () => {
     phone: ""
   });
 
+  // ================= HANDLE INPUT =================
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -37,11 +53,14 @@ const PlaceOrder = () => {
     });
   };
 
+  // ================= PLACE ORDER =================
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const token = localStorage.getItem("token");
 
+    // Check login
     if (!token) {
       alert("Please login first");
       navigate("/login");
@@ -51,23 +70,17 @@ const PlaceOrder = () => {
     try {
       setLoading(true);
 
-      // ===============================
-      // CREATE ORDER ITEMS
-      // ===============================
+      // ================= CREATE ORDER ITEMS =================
 
       const orderItems = [];
 
       for (const productId in cartItems) {
         for (const size in cartItems[productId]) {
-
-          const quantity =
-            cartItems[productId][size];
+          const quantity = cartItems[productId][size];
 
           if (quantity > 0) {
-
             const product = products.find(
-              (item) =>
-                item._id === productId
+              (item) => item._id === productId
             );
 
             if (product) {
@@ -84,14 +97,15 @@ const PlaceOrder = () => {
         }
       }
 
+      // ================= CHECK CART =================
+
       if (orderItems.length === 0) {
         alert("Your cart is empty");
+        setLoading(false);
         return;
       }
 
-      // ===============================
-      // ADDRESS
-      // ===============================
+      // ================= ADDRESS =================
 
       const address = {
         firstName: formData.firstName,
@@ -105,9 +119,7 @@ const PlaceOrder = () => {
         phone: formData.phone
       };
 
-      // ===============================
-      // PAYMENT METHOD
-      // ===============================
+      // ================= PAYMENT METHOD =================
 
       let selectedPaymentMethod = "Cash on Delivery";
 
@@ -119,9 +131,7 @@ const PlaceOrder = () => {
         selectedPaymentMethod = "Razorpay";
       }
 
-      // ===============================
-      // ORDER DATA
-      // ===============================
+      // ================= ORDER DATA =================
 
       const orderData = {
         items: orderItems,
@@ -132,12 +142,10 @@ const PlaceOrder = () => {
 
       console.log("Sending Order:", orderData);
 
-      // ===============================
-      // SEND ORDER TO BACKEND
-      // ===============================
+      // ================= SEND ORDER TO BACKEND =================
 
       const response = await fetch(
-        "http://localhost:4000/api/order/place",
+        `${backendUrl}/api/order/place`,
         {
           method: "POST",
 
@@ -154,34 +162,29 @@ const PlaceOrder = () => {
 
       console.log("Order API Response:", data);
 
+      // ================= CHECK RESPONSE =================
+
       if (!response.ok || !data.success) {
         alert(
           data.message ||
           "Failed to place order"
         );
+
         return;
       }
 
-      // ===============================
-      // CLEAR CART
-      // ===============================
+      // ================= CLEAR CART =================
 
       setCartItems({});
 
       alert("Order placed successfully!");
 
-      // ===============================
-      // GO TO ORDERS
-      // ===============================
+      // ================= GO TO ORDERS =================
 
       navigate("/orders");
 
     } catch (error) {
-
-      console.error(
-        "Place Order Error:",
-        error
-      );
+      console.error("Place Order Error:", error);
 
       alert(
         "Unable to connect to server"
@@ -192,15 +195,17 @@ const PlaceOrder = () => {
     }
   };
 
+  // ================= TOTAL =================
+
   const subtotal = getCartAmount();
   const total = subtotal + delivery_fee;
+
+  // ================= UI =================
 
   return (
     <div className="place-order">
 
-      {/* ===============================
-                LEFT SIDE
-            =============================== */}
+      {/* ================= LEFT SIDE ================= */}
 
       <div className="delivery-section">
 
@@ -210,6 +215,8 @@ const PlaceOrder = () => {
             <span>INFORMATION</span>
           </h2>
         </div>
+
+        {/* NAME */}
 
         <div className="name-fields">
 
@@ -233,6 +240,8 @@ const PlaceOrder = () => {
 
         </div>
 
+        {/* EMAIL */}
+
         <input
           type="email"
           name="email"
@@ -242,6 +251,8 @@ const PlaceOrder = () => {
           required
         />
 
+        {/* STREET */}
+
         <input
           type="text"
           name="street"
@@ -250,6 +261,8 @@ const PlaceOrder = () => {
           onChange={handleChange}
           required
         />
+
+        {/* CITY + STATE */}
 
         <div className="name-fields">
 
@@ -273,6 +286,8 @@ const PlaceOrder = () => {
 
         </div>
 
+        {/* ZIP + COUNTRY */}
+
         <div className="name-fields">
 
           <input
@@ -295,6 +310,8 @@ const PlaceOrder = () => {
 
         </div>
 
+        {/* PHONE */}
+
         <input
           type="tel"
           name="phone"
@@ -306,13 +323,11 @@ const PlaceOrder = () => {
 
       </div>
 
-      {/* ===============================
-                RIGHT SIDE
-            =============================== */}
+      {/* ================= RIGHT SIDE ================= */}
 
       <div className="order-section">
 
-        {/* CART TOTAL */}
+        {/* ================= CART TOTAL ================= */}
 
         <div className="place-order-total">
 
@@ -357,7 +372,7 @@ const PlaceOrder = () => {
 
         </div>
 
-        {/* PAYMENT METHOD */}
+        {/* ================= PAYMENT METHOD ================= */}
 
         <div className="payment-section">
 
@@ -380,21 +395,16 @@ const PlaceOrder = () => {
                   : ""
                 }`}
               onClick={() =>
-                setPaymentMethod(
-                  "stripe"
-                )
+                setPaymentMethod("stripe")
               }
             >
 
               <span className="radio">
-                {paymentMethod ===
-                  "stripe" && "●"}
+                {paymentMethod === "stripe" && "●"}
               </span>
 
               <img
-                src={
-                  assets.stripe_logo
-                }
+                src={assets.stripe_logo}
                 alt="Stripe"
               />
 
@@ -405,27 +415,21 @@ const PlaceOrder = () => {
             {/* RAZORPAY */}
 
             <div
-              className={`payment-option ${paymentMethod ===
-                  "razorpay"
+              className={`payment-option ${paymentMethod === "razorpay"
                   ? "selected"
                   : ""
                 }`}
               onClick={() =>
-                setPaymentMethod(
-                  "razorpay"
-                )
+                setPaymentMethod("razorpay")
               }
             >
 
               <span className="radio">
-                {paymentMethod ===
-                  "razorpay" && "●"}
+                {paymentMethod === "razorpay" && "●"}
               </span>
 
               <img
-                src={
-                  assets.razorpay_logo
-                }
+                src={assets.razorpay_logo}
                 alt="Razorpay"
               />
 
@@ -433,7 +437,7 @@ const PlaceOrder = () => {
 
             </div>
 
-            {/* COD */}
+            {/* CASH ON DELIVERY */}
 
             <div
               className={`payment-option ${paymentMethod === "cod"
@@ -446,8 +450,7 @@ const PlaceOrder = () => {
             >
 
               <span className="radio">
-                {paymentMethod ===
-                  "cod" && "●"}
+                {paymentMethod === "cod" && "●"}
               </span>
 
               <span>
@@ -460,7 +463,7 @@ const PlaceOrder = () => {
 
         </div>
 
-        {/* PLACE ORDER */}
+        {/* ================= PLACE ORDER ================= */}
 
         <button
           className="place-order-btn"

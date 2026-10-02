@@ -4,7 +4,8 @@ const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const backendUrl = "http://localhost:4000";
+  // ✅ Use Render backend URL from environment variable
+  const backendUrl = import.meta.env.VITE_API_URL;
 
   const token = localStorage.getItem("token");
 
@@ -27,8 +28,10 @@ const Orders = () => {
 
       const data = await response.json();
 
+      console.log("Orders Response:", data);
+
       if (data.success) {
-        setOrders(data.orders);
+        setOrders(data.orders || []);
       } else {
         console.log(data.message);
       }
@@ -43,6 +46,8 @@ const Orders = () => {
     fetchOrders();
   }, []);
 
+  // ================= LOADING =================
+
   if (loading) {
     return (
       <div className="orders-page">
@@ -51,6 +56,8 @@ const Orders = () => {
       </div>
     );
   }
+
+  // ================= NOT LOGGED IN =================
 
   if (!token) {
     return (
@@ -61,11 +68,15 @@ const Orders = () => {
     );
   }
 
+  // ================= ORDERS =================
+
   return (
     <div className="orders-page">
 
       <div className="orders-title">
-        <h1>MY <span>ORDERS</span></h1>
+        <h1>
+          MY <span>ORDERS</span>
+        </h1>
       </div>
 
       {orders.length === 0 ? (
@@ -78,9 +89,15 @@ const Orders = () => {
 
           {orders.map((order) => (
 
-            <div className="order-card" key={order._id}>
+            <div
+              className="order-card"
+              key={order._id}
+            >
+
+              {/* ================= ORDER HEADER ================= */}
 
               <div className="order-header">
+
                 <div>
                   <h3>Order ID</h3>
                   <p>{order._id}</p>
@@ -89,50 +106,61 @@ const Orders = () => {
                 <div>
                   <h3>Date</h3>
                   <p>
-                    {new Date(
-                      order.createdAt
-                    ).toLocaleDateString()}
+                    {order.createdAt
+                      ? new Date(
+                        order.createdAt
+                      ).toLocaleDateString()
+                      : "N/A"}
                   </p>
                 </div>
+
               </div>
+
+              {/* ================= ORDER ITEMS ================= */}
 
               <div className="order-items">
 
-                {order.items?.map((item, index) => (
+                {order.items?.map(
+                  (item, index) => (
 
-                  <div
-                    className="order-item"
-                    key={index}
-                  >
+                    <div
+                      className="order-item"
+                      key={index}
+                    >
 
-                    <div className="order-item-info">
+                      <div className="order-item-info">
 
-                      <h4>
-                        {item.name ||
-                          "Product"}
-                      </h4>
+                        <h4>
+                          {item.name ||
+                            "Product"}
+                        </h4>
 
-                      <p>
-                        Size:{" "}
-                        {item.size || "N/A"}
-                      </p>
+                        <p>
+                          Size:{" "}
+                          {item.size ||
+                            "N/A"}
+                        </p>
 
-                      <p>
-                        Quantity:{" "}
-                        {item.quantity || 1}
-                      </p>
+                        <p>
+                          Quantity:{" "}
+                          {item.quantity ||
+                            1}
+                        </p>
+
+                      </div>
+
+                      <div className="order-item-price">
+                        ${item.price || 0}
+                      </div>
 
                     </div>
 
-                    <div className="order-item-price">
-                      ${item.price || 0}
-                    </div>
-
-                  </div>
-
-                ))}
+                  )
+                )}
 
               </div>
+
+              {/* ================= ORDER FOOTER ================= */}
 
               <div className="order-footer">
 
@@ -140,21 +168,23 @@ const Orders = () => {
                   <strong>
                     Payment:
                   </strong>{" "}
-                  {order.paymentMethod}
+                  {order.paymentMethod ||
+                    "N/A"}
                 </div>
 
                 <div>
                   <strong>
                     Status:
                   </strong>{" "}
-                  {order.status}
+                  {order.status ||
+                    "Order Placed"}
                 </div>
 
                 <div>
                   <strong>
                     Total:
                   </strong>{" "}
-                  ${order.amount}
+                  ${order.amount || 0}
                 </div>
 
               </div>

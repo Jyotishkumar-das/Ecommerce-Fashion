@@ -4,8 +4,6 @@ import React, {
     useState
 } from "react";
 
-import { products as productData } from "../assets/assets";
-
 export const ShopContext = createContext();
 
 const ShopContextProvider = ({ children }) => {
@@ -32,19 +30,55 @@ const ShopContextProvider = ({ children }) => {
     const currency = "$";
     const delivery_fee = 10;
 
+    // ================= BACKEND URL =================
+
+    const backendUrl = import.meta.env.VITE_API_URL;
+
 
     // ================= LOAD PRODUCTS =================
 
+    const getProducts = async () => {
+
+        try {
+
+            const response = await fetch(
+                `${backendUrl}/api/product/list`
+            );
+
+            const data = await response.json();
+
+            if (data.success) {
+
+                setProducts(data.products);
+
+            } else {
+
+                console.log(
+                    "Product Error:",
+                    data.message
+                );
+            }
+
+        } catch (error) {
+
+            console.log(
+                "Product API Error:",
+                error
+            );
+        }
+    };
+
+
     useEffect(() => {
 
-        setProducts(productData);
+        getProducts();
 
     }, []);
 
 
     // ================= ADD TO CART =================
 
-    const addToCart = (itemId, size) => {
+    const addToCart = async (itemId, size) => {
 
         if (!size) {
 
@@ -53,33 +87,75 @@ const ShopContextProvider = ({ children }) => {
             return;
         }
 
+
+        // Update local cart
+
         setCartItems((prev) => {
 
             const updated = {
                 ...prev
             };
 
-            // Create product if it doesn't exist
             if (!updated[itemId]) {
 
                 updated[itemId] = {};
             }
 
-            // Create a new object for the selected product
             updated[itemId] = {
+
                 ...updated[itemId],
+
                 [size]:
                     (updated[itemId][size] || 0) + 1
             };
 
             return updated;
         });
+
+
+        // Update backend cart
+
+        if (token) {
+
+            try {
+
+                await fetch(
+                    `${backendUrl}/api/cart/add`,
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json",
+
+                            Authorization:
+                                `Bearer ${token}`
+                        },
+
+                        body: JSON.stringify({
+                            itemId,
+                            size
+                        })
+                    }
+                );
+
+            } catch (error) {
+
+                console.log(
+                    "Add cart API Error:",
+                    error
+                );
+            }
+        }
     };
 
 
     // ================= REMOVE FROM CART =================
 
-    const removeFromCart = (itemId, size) => {
+    const removeFromCart = async (itemId, size) => {
+
+        let newQuantity = 0;
+
 
         setCartItems((prev) => {
 
@@ -101,12 +177,20 @@ const ShopContextProvider = ({ children }) => {
 
             productCart[size]--;
 
+            newQuantity =
+                productCart[size];
+
             if (productCart[size] <= 0) {
 
                 delete productCart[size];
+
+                newQuantity = 0;
             }
 
-            if (Object.keys(productCart).length === 0) {
+
+            if (
+                Object.keys(productCart).length === 0
+            ) {
 
                 delete updated[itemId];
 
@@ -115,8 +199,46 @@ const ShopContextProvider = ({ children }) => {
                 updated[itemId] = productCart;
             }
 
+
             return updated;
         });
+
+
+        // Update backend cart
+
+        if (token) {
+
+            try {
+
+                await fetch(
+                    `${backendUrl}/api/cart/update`,
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json",
+
+                            Authorization:
+                                `Bearer ${token}`
+                        },
+
+                        body: JSON.stringify({
+                            itemId,
+                            size,
+                            quantity: newQuantity
+                        })
+                    }
+                );
+
+            } catch (error) {
+
+                console.log(
+                    "Remove cart API Error:",
+                    error
+                );
+            }
+        }
     };
 
 
@@ -155,6 +277,7 @@ const ShopContextProvider = ({ children }) => {
             );
 
             if (!product) {
+
                 continue;
             }
 

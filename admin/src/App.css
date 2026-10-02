@@ -1,0 +1,470 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f7f7f7;
+  color: #222;
+}
+
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
+}
+
+/* ================= ADMIN NAVBAR ================= */
+
+.admin-navbar {
+  height: 70px;
+  background: white;
+  border-bottom: 1px solid #ddd;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 35px;
+}
+
+.admin-logo {
+  font-size: 28px;
+  font-weight: 500;
+}
+
+.admin-logo span {
+  color: #d88ba5;
+}
+
+.admin-navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.admin-navbar-right span {
+  font-size: 14px;
+}
+
+.admin-navbar-right button {
+  padding: 9px 18px;
+  border: 1px solid #222;
+  background: white;
+  cursor: pointer;
+}
+
+/* ================= LAYOUT ================= */
+
+.admin-layout {
+  display: flex;
+  min-height: calc(100vh - 70px);
+}
+
+/* ================= SIDEBAR ================= */
+
+.sidebar {
+  width: 230px;
+  background: white;
+  border-right: 1px solid #ddd;
+
+  padding: 30px 15px;
+}
+
+.sidebar-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #777;
+
+  margin-bottom: 25px;
+  padding-left: 10px;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 14px 15px;
+
+  margin-bottom: 8px;
+
+  text-decoration: none;
+  color: #333;
+
+  border: 1px solid transparent;
+}
+
+.sidebar-link span {
+  font-size: 20px;
+}
+
+.sidebar-link:hover,
+.sidebar-link.active {
+  background: #f5f5f5;
+  border-color: #ddd;
+}
+
+/* ================= MAIN ================= */
+
+.admin-main {
+  flex: 1;
+  padding: 35px;
+}
+
+.admin-page {
+  max-width: 1100px;
+  margin: auto;
+}
+
+.admin-page h2 {
+  font-size: 24px;
+  font-weight: 500;
+  margin-bottom: 30px;
+}
+
+/* ================= LOGIN ================= */
+
+.admin-login-page {
+  min-height: 100vh;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: #f7f7f7;
+}
+
+.admin-login-form {
+  width: 400px;
+  background: white;
+
+  padding: 40px;
+
+  border: 1px solid #ddd;
+}
+
+.admin-login-form h1 {
+  text-align: center;
+  font-size: 30px;
+  margin-bottom: 8px;
+}
+
+.admin-login-form h1 span {
+  color: #d88ba5;
+}
+
+.admin-login-form h2 {
+  text-align: center;
+  font-size: 18px;
+  font-weight: 400;
+  margin-bottom: 30px;
+}
+
+.admin-login-form input {
+  width: 100%;
+  padding: 13px;
+
+  border: 1px solid #ccc;
+  outline: none;
+
+  margin-bottom: 15px;
+}
+
+.admin-login-form button {
+  width: 100%;
+  padding: 13px;
+
+  background: black;
+  color: white;
+
+  border: none;
+  cursor: pointer;
+}
+
+/* ================= ADD PRODUCT ================= */
+
+.add-product-form {
+  width: 100%;
+  max-width: 700px;
+
+  background: white;
+  border: 1px solid #ddd;
+
+  padding: 30px;
+}
+
+.add-product-form label {
+  display: block;
+
+  font-size: 14px;
+  margin-bottom: 8px;
+  margin-top: 18px;
+}
+
+.add-product-form input,
+.add-product-form textarea,
+.add-product-form select {
+  width: 100%;
+
+  padding: 12px;
+
+  border: 1px solid #ccc;
+  outline: none;
+}
+
+.add-product-form textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.size-options {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.size-options button {
+  padding: 9px 18px;
+
+  background: #f5f5f5;
+  border: 1px solid #ccc;
+
+  cursor: pointer;
+}
+
+.size-options button.size-active {
+  background: black;
+  color: white;
+  border-color: black;
+}
+
+.checkbox-label {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+}
+
+.checkbox-label input {
+  width: auto;
+}
+
+.submit-button {
+  margin-top: 25px;
+
+  padding: 13px 25px;
+
+  background: black;
+  color: white;
+
+  border: none;
+  cursor: pointer;
+}
+
+/* ================= PRODUCT LIST ================= */
+
+.product-table {
+  background: white;
+  border: 1px solid #ddd;
+}
+
+.product-table-header,
+.product-row {
+  display: grid;
+
+  grid-template-columns:
+    80px 2fr 1fr 100px 100px;
+
+  align-items: center;
+
+  gap: 15px;
+
+  padding: 15px 20px;
+
+  border-bottom: 1px solid #eee;
+}
+
+.product-table-header {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.product-row {
+  font-size: 14px;
+}
+
+.product-row img {
+  width: 55px;
+  height: 65px;
+  object-fit: cover;
+}
+
+.product-row button {
+  background: #111;
+  color: white;
+
+  border: none;
+
+  padding: 8px 12px;
+
+  cursor: pointer;
+}
+
+/* ================= ORDERS ================= */
+
+.admin-orders {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.admin-order-card {
+  background: white;
+
+  border: 1px solid #ddd;
+
+  padding: 25px;
+}
+
+.order-info {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 12px;
+
+  padding-bottom: 20px;
+
+  border-bottom: 1px solid #eee;
+}
+
+.order-info p {
+  font-size: 14px;
+}
+
+.order-products {
+  margin-top: 20px;
+}
+
+.order-product {
+  display: flex;
+  gap: 30px;
+
+  padding: 10px 0;
+
+  border-bottom: 1px solid #eee;
+
+  font-size: 14px;
+}
+
+.order-status {
+  margin-top: 20px;
+
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.order-status select {
+  padding: 9px;
+
+  border: 1px solid #ccc;
+}
+
+.empty-orders {
+  background: white;
+  border: 1px solid #ddd;
+
+  padding: 60px;
+
+  text-align: center;
+}
+
+.empty-orders h3 {
+  margin-bottom: 10px;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 768px) {
+
+  .admin-navbar {
+    padding: 0 20px;
+  }
+
+  .admin-navbar-right span {
+    display: none;
+  }
+
+  .admin-layout {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+
+    display: flex;
+
+    padding: 10px;
+
+    border-right: none;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .sidebar-title {
+    display: none;
+  }
+
+  .sidebar-link {
+    flex: 1;
+    justify-content: center;
+    margin: 0;
+  }
+
+  .admin-main {
+    padding: 20px;
+  }
+
+  .product-table {
+    overflow-x: auto;
+  }
+
+  .product-table-header,
+  .product-row {
+    min-width: 650px;
+  }
+
+  .order-info {
+    grid-template-columns: 1fr;
+  }
+
+  .order-product {
+    flex-direction: column;
+    gap: 5px;
+  }
+}
+
+@media (max-width: 480px) {
+
+  .admin-logo {
+    font-size: 22px;
+  }
+
+  .admin-main {
+    padding: 15px;
+  }
+
+  .admin-login-form {
+    width: calc(100% - 30px);
+    padding: 25px;
+  }
+
+  .sidebar-link {
+    font-size: 12px;
+  }
+
+  .sidebar-link span {
+    display: none;
+  }
+}

@@ -18,7 +18,7 @@ const Login = () => {
     e.preventDefault();
 
     // Backend URL
-    const backendUrl = "http://localhost:4000";
+    const backendUrl = import.meta.env.VITE_API_URL;
 
     // Select API endpoint
     const endpoint =
@@ -44,11 +44,9 @@ const Login = () => {
         `${backendUrl}${endpoint}`,
         {
           method: "POST",
-
           headers: {
             "Content-Type": "application/json",
           },
-
           body: JSON.stringify(body),
         }
       );
@@ -63,16 +61,10 @@ const Login = () => {
       }
 
       if (data.success) {
-        // Save token
-        localStorage.setItem(
-          "token",
-          data.token
-        );
+        localStorage.setItem("token", data.token);
 
-        // Update context token
         setToken(data.token);
 
-        // Go to home page
         navigate("/");
 
         alert(
@@ -81,20 +73,12 @@ const Login = () => {
             : "Login successful"
         );
       } else {
-        alert(
-          data.message ||
-          "Authentication failed"
-        );
+        alert(data.message || "Authentication failed");
       }
     } catch (error) {
-      console.error(
-        "Connection Error:",
-        error
-      );
+      console.error("Connection Error:", error);
 
-      alert(
-        "Unable to connect to server. Please make sure the backend is running on port 4000."
-      );
+      alert("Unable to connect to server.");
     }
   };
 
@@ -104,68 +88,48 @@ const Login = () => {
         className="login-form"
         onSubmit={submitHandler}
       >
-        {/* ================= TITLE ================= */}
-
         <h1>
           {currentState}
           <span> —</span>
         </h1>
-
-        {/* ================= NAME ================= */}
 
         {currentState === "Sign Up" && (
           <input
             type="text"
             placeholder="Name"
             value={name}
-            onChange={(e) =>
-              setName(e.target.value)
-            }
+            onChange={(e) => setName(e.target.value)}
             required
           />
         )}
-
-        {/* ================= EMAIL ================= */}
 
         <input
           type="email"
           placeholder="Email"
           value={email}
-          onChange={(e) =>
-            setEmail(e.target.value)
-          }
+          onChange={(e) => setEmail(e.target.value)}
           required
         />
-
-        {/* ================= PASSWORD ================= */}
 
         <input
           type="password"
           placeholder="Password"
           value={password}
-          onChange={(e) =>
-            setPassword(e.target.value)
-          }
+          onChange={(e) => setPassword(e.target.value)}
           required
         />
 
-        {/* ================= LINKS ================= */}
-
         <div className="login-links">
-          <span>
-            Forgot your password?
-          </span>
+          <span>Forgot your password?</span>
 
           <span
             onClick={() => {
               setCurrentState(
-                currentState ===
-                  "Sign Up"
+                currentState === "Sign Up"
                   ? "Login"
                   : "Sign Up"
               );
 
-              // Clear fields
               setName("");
               setEmail("");
               setPassword("");
@@ -176,8 +140,6 @@ const Login = () => {
               : "Create Account"}
           </span>
         </div>
-
-        {/* ================= BUTTON ================= */}
 
         <button type="submit">
           {currentState}

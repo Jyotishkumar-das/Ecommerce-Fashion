@@ -3,7 +3,7 @@ import React, {
     useEffect,
     useState
 } from "react";
-import { products as productData } from "../assets/assets";
+
 
 export const ShopContext = createContext();
 

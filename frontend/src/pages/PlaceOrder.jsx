@@ -9,7 +9,8 @@ const PlaceOrder = () => {
 
   // ================= BACKEND URL =================
 
-  const backendUrl = import.meta.env.VITE_API_URL;
+  const backendUrl =
+    import.meta.env.VITE_API_URL || "http://localhost:4000";
 
   // ================= SHOP CONTEXT =================
 
@@ -142,32 +143,64 @@ const PlaceOrder = () => {
 
       console.log("Sending Order:", orderData);
 
-      // ================= SEND ORDER TO BACKEND =================
+      // ================= SEND ORDER =================
 
       const response = await fetch(
         `${backendUrl}/api/order/place`,
         {
           method: "POST",
-
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`
           },
-
           body: JSON.stringify(orderData)
         }
       );
 
-      const data = await response.json();
+      // ================= READ SERVER RESPONSE =================
 
-      console.log("Order API Response:", data);
+      const responseText = await response.text();
+
+      console.log(
+        "Order HTTP Status:",
+        response.status
+      );
+
+      console.log(
+        "Order Raw Response:",
+        responseText
+      );
+
+      let data = {};
+
+      if (responseText) {
+        try {
+          data = JSON.parse(responseText);
+        } catch (parseError) {
+          console.error(
+            "Invalid JSON from server:",
+            parseError
+          );
+
+          alert(
+            `Server returned an invalid response. HTTP Status: ${response.status}`
+          );
+
+          return;
+        }
+      }
+
+      console.log(
+        "Order API Response:",
+        data
+      );
 
       // ================= CHECK RESPONSE =================
 
       if (!response.ok || !data.success) {
         alert(
           data.message ||
-          "Failed to place order"
+          `Failed to place order. HTTP Status: ${response.status}`
         );
 
         return;
@@ -177,6 +210,8 @@ const PlaceOrder = () => {
 
       setCartItems({});
 
+      // ================= SUCCESS =================
+
       alert("Order placed successfully!");
 
       // ================= GO TO ORDERS =================
@@ -184,9 +219,13 @@ const PlaceOrder = () => {
       navigate("/orders");
 
     } catch (error) {
-      console.error("Place Order Error:", error);
+      console.error(
+        "Place Order Error:",
+        error
+      );
 
       alert(
+        error.message ||
         "Unable to connect to server"
       );
 
@@ -332,9 +371,11 @@ const PlaceOrder = () => {
         <div className="place-order-total">
 
           <div className="section-title">
+
             <h2>
               CART <span>TOTAL</span>
             </h2>
+
           </div>
 
           <div className="total-row">
@@ -400,7 +441,8 @@ const PlaceOrder = () => {
             >
 
               <span className="radio">
-                {paymentMethod === "stripe" && "●"}
+                {paymentMethod === "stripe" &&
+                  "●"}
               </span>
 
               <img
@@ -425,7 +467,8 @@ const PlaceOrder = () => {
             >
 
               <span className="radio">
-                {paymentMethod === "razorpay" && "●"}
+                {paymentMethod === "razorpay" &&
+                  "●"}
               </span>
 
               <img
@@ -450,7 +493,8 @@ const PlaceOrder = () => {
             >
 
               <span className="radio">
-                {paymentMethod === "cod" && "●"}
+                {paymentMethod === "cod" &&
+                  "●"}
               </span>
 
               <span>

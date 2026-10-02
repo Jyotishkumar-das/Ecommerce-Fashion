@@ -17,16 +17,14 @@ const Login = () => {
   const submitHandler = async (e) => {
     e.preventDefault();
 
-    // Backend URL
-    const backendUrl = import.meta.env.VITE_API_URL;
+    const backendUrl =
+      import.meta.env.VITE_API_URL || "http://localhost:4000";
 
-    // Select API endpoint
     const endpoint =
       currentState === "Sign Up"
         ? "/api/user/register"
         : "/api/user/login";
 
-    // Select request body
     const body =
       currentState === "Sign Up"
         ? {
@@ -40,6 +38,8 @@ const Login = () => {
         };
 
     try {
+      console.log("Sending Authentication:", body);
+
       const response = await fetch(
         `${backendUrl}${endpoint}`,
         {
@@ -51,34 +51,83 @@ const Login = () => {
         }
       );
 
-      const data = await response.json();
+      // Read response as text first
+      const responseText = await response.text();
 
-      console.log("Server Response:", data);
+      console.log("Login HTTP Status:", response.status);
+      console.log("Login Raw Response:", responseText);
 
+      let data = {};
+
+      // Convert response to JSON only if something was returned
+      if (responseText) {
+        try {
+          data = JSON.parse(responseText);
+        } catch (parseError) {
+          console.error(
+            "Invalid JSON from server:",
+            parseError
+          );
+
+          alert(
+            `Server returned an invalid response. HTTP Status: ${response.status}`
+          );
+
+          return;
+        }
+      }
+
+      console.log("Login API Response:", data);
+
+      // Check HTTP status
       if (!response.ok) {
-        alert(data.message || "Something went wrong");
+        alert(
+          data.message ||
+          `Authentication failed. HTTP Status: ${response.status}`
+        );
         return;
       }
 
-      if (data.success) {
-        localStorage.setItem("token", data.token);
-
-        setToken(data.token);
-
-        navigate("/");
-
+      // Check API success
+      if (!data.success) {
         alert(
-          currentState === "Sign Up"
-            ? "Account created successfully"
-            : "Login successful"
+          data.message ||
+          "Authentication failed"
         );
-      } else {
-        alert(data.message || "Authentication failed");
+        return;
       }
+
+      // Make sure token exists
+      if (!data.token) {
+        console.error("Token missing from server response");
+
+        alert("Login successful, but token was not received.");
+        return;
+      }
+
+      // Save token
+      localStorage.setItem("token", data.token);
+
+      // Update context
+      setToken(data.token);
+
+      console.log("Token saved successfully");
+
+      // Go home
+      navigate("/");
+
+      alert(
+        currentState === "Sign Up"
+          ? "Account created successfully"
+          : "Login successful"
+      );
     } catch (error) {
       console.error("Connection Error:", error);
 
-      alert("Unable to connect to server.");
+      alert(
+        error.message ||
+        "Unable to connect to server."
+      );
     }
   };
 
@@ -98,7 +147,9 @@ const Login = () => {
             type="text"
             placeholder="Name"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) =>
+              setName(e.target.value)
+            }
             required
           />
         )}
@@ -107,7 +158,9 @@ const Login = () => {
           type="email"
           placeholder="Email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) =>
+            setEmail(e.target.value)
+          }
           required
         />
 
@@ -115,7 +168,9 @@ const Login = () => {
           type="password"
           placeholder="Password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) =>
+            setPassword(e.target.value)
+          }
           required
         />
 
